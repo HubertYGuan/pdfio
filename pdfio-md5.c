@@ -24,6 +24,7 @@
 // ghost@aladdin.com
 //
 
+// leave as is, will have to pay attention to endianness
 #include "pdfio-private.h"
 
 

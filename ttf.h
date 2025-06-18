@@ -9,6 +9,7 @@
 // information.
 //
 
+// leave as is
 #ifndef TTF_H
 #  define TTF_H
 #  include <stddef.h>

@@ -7,6 +7,7 @@
 // information.
 //
 
+// leave as is
 #ifndef PDFIO_CONTENT_H
 #  define PDFIO_CONTENT_H
 #  include "pdfio.h"
