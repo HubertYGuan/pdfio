@@ -7,6 +7,7 @@
 // information.
 //
 
+// remove Windows stuff
 #include "pdfio-private.h"
 
 
@@ -277,12 +278,7 @@ _pdfioValueDebug(_pdfio_value_t *v,	// I - Value
     case PDFIO_VALTYPE_DATE :
         {
 	  struct tm	dateval;	// Date value
-
-#ifdef _WIN32
-          gmtime_s(&dateval, &v->value.date);
-#else
           gmtime_r(&v->value.date, &dateval);
-#endif // _WIN32
 
           fprintf(fp, "(D:%04d%02d%02d%02d%02d%02dZ)", dateval.tm_year + 1900, dateval.tm_mon + 1, dateval.tm_mday, dateval.tm_hour, dateval.tm_min, dateval.tm_sec);
         }
@@ -682,11 +678,7 @@ _pdfioValueWrite(pdfio_file_t   *pdf,	// I - PDF file
           struct tm	date;		// Date values
           char		datestr[32];	// Formatted date value
 
-#ifdef _WIN32
-          gmtime_s(&date, &v->value.date);
-#else
 	  gmtime_r(&v->value.date, &date);
-#endif // _WIN32
 
 	  snprintf(datestr, sizeof(datestr), "D:%04d%02d%02d%02d%02d%02dZ", date.tm_year + 1900, date.tm_mon + 1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
 
@@ -891,11 +883,7 @@ get_date_time(const char *s)		// I - PDF date/time value
   }
 
   // Convert date value to time_t...
-#if _WIN32
-  if ((t = _mkgmtime(&dateval)) <= 0)
-    return (0);
-
-#elif defined(HAVE_TIMEGM)
+#if defined(HAVE_TIMEGM)
   if ((t = timegm(&dateval)) <= 0)
     return (0);
 
@@ -914,7 +902,7 @@ get_date_time(const char *s)		// I - PDF date/time value
   // which also reflects any DST offset...
   t += timezone;
 #  endif // HAVE_TM_GMTOFF
-#endif // _WIN32
+#endif // HAVE_TIMEGM
 
   return (t - offset);
 }

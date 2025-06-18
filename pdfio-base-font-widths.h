@@ -7,6 +7,7 @@
 // information.
 //
 
+// leave as is
 #ifndef PDFIO_BASE_FONT_WIDTHS_H
 #  define PDFIO_BASE_FONT_WIDTHS_H 1
 

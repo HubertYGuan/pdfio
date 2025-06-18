@@ -7,21 +7,11 @@
 // information.
 //
 
+// remove windows stuff, need zephyr random
 #include "pdfio-private.h"
-#if _WIN32
-#  include <windows.h>
-#  include <bcrypt.h>
-#  include <sys/types.h>
-#  include <sys/timeb.h>
-#else
-#  include <sys/time.h>
-#endif // _WIN32
-#ifdef __has_include
-#  if __has_include(<sys/random.h>)
-#    define HAVE_GETRANDOM 1
-#    include <sys/random.h>
-#  endif // __has_include(<sys/random.h>)
-#endif // __has_include
+#include <sys/time.h>
+// randomization may not have enough entropy on certain platforms
+#include <zephyr/sys/random.h>
 
 
 //
@@ -229,77 +219,7 @@ void
 _pdfioCryptoMakeRandom(uint8_t *buffer,	// I - Buffer
                        size_t  bytes)	// I - Number of bytes
 {
-#ifdef __APPLE__
-  // macOS/iOS provide the arc4random function which is seeded with entropy
-  // from the system...
-  while (bytes > 0)
-  {
-    // Just collect 8 bits from each call to fill the buffer...
-    *buffer++ = (uint8_t)arc4random();
-    bytes --;
-  }
-
-#else
-#  if _WIN32
-  // Windows provides the CryptGenRandom function...
-  HCRYPTPROV	prov;			// Cryptographic provider
-
-  if (CryptAcquireContextA(&prov, NULL, NULL, PROV_RSA_FULL, 0))
-  {
-    // Got the default crypto provider, try to get random data...
-    BOOL success = CryptGenRandom(prov, (DWORD)bytes, buffer);
-
-    // Release the crypto provider and return on success...
-    CryptReleaseContext(prov, 0);
-
-    if (success)
-      return;
-  }
-
-#  elif HAVE_GETRANDOM
-  // Linux provides a system call called getrandom that uses system entropy ...
-  ssize_t	rbytes;			// Bytes read
-
-  while (bytes > 0)
-  {
-    if ((rbytes = getrandom(buffer, bytes, 0)) < 0)
-    {
-      if (errno != EINTR && errno != EAGAIN)
-	break;
-    }
-    bytes -= (size_t)rbytes;
-    buffer += rbytes;
-  }
-
-  if (bytes == 0)
-    return;
-
-#  else
-  // Other UNIX-y systems have /dev/urandom...
-  int		fd;			// Random number file
-  ssize_t	rbytes;			// Bytes read
-
-
-  // Fall back on /dev/urandom...
-  if ((fd = open("/dev/urandom", O_RDONLY)) >= 0)
-  {
-    while (bytes > 0)
-    {
-      if ((rbytes = read(fd, buffer, bytes)) < 0)
-      {
-        if (errno != EINTR && errno != EAGAIN)
-          break;
-      }
-      bytes -= (size_t)rbytes;
-      buffer += rbytes;
-    }
-
-    close(fd);
-
-    if (bytes == 0)
-      return;
-  }
-#  endif // _WIN32
+  if (sys_csrand_get(buffer, len) == 0) return;
 
   // If we get here then we were unable to get enough random data or the local
   // system doesn't have enough entropy.  Make some up...
@@ -307,13 +227,7 @@ _pdfioCryptoMakeRandom(uint8_t *buffer,	// I - Buffer
 		mt_state[624],		// Mersenne twister state
 		mt_index,		// Mersenne twister index
 		temp;			// Temporary value
-#  if _WIN32
-  struct _timeb curtime;		// Current time
 
-  _ftime(&curtime);
-  mt_state[0] = (uint32_t)(curtime.time + curtime.millitm);
-
-#  else
   struct timeval curtime;		// Current time
 
   gettimeofday(&curtime, NULL);
@@ -390,7 +304,6 @@ _pdfioCryptoMakeRandom(uint8_t *buffer,	// I - Buffer
           break;
     }
   }
-#endif // __APPLE__
 }
 
 

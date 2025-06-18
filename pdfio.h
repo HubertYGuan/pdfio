@@ -7,6 +7,7 @@
 // information.
 //
 
+// Windows stuff not needed
 #ifndef PDFIO_H
 #  define PDFIO_H
 #  include <stdio.h>
@@ -44,10 +45,6 @@ extern "C" {
 //
 // Types and constants...
 //
-
-#  if _WIN32
-typedef __int64 ssize_t;		// POSIX type not present on Windows @private@
-#  endif // _WIN32
 
 typedef struct _pdfio_array_s pdfio_array_t;
 					// Array of PDF values

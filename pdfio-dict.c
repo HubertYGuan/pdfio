@@ -9,7 +9,7 @@
 
 #include "pdfio-private.h"
 
-
+// leave as is
 //
 // Local functions...
 //

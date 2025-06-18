@@ -74,6 +74,7 @@
  *   to hash the final few bits of the input.
  */
 
+// leave as is
 #include "pdfio-private.h"
 
 /* Constants from sha.h */

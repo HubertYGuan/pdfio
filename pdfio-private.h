@@ -7,11 +7,9 @@
 // information.
 //
 
+// no Windows stuff, also replaced zlib with lz4
 #ifndef PDFIO_PRIVATE_H
 #  define PDFIO_PRIVATE_H
-#  ifdef _WIN32
-#    define _CRT_SECURE_NO_WARNINGS 1	// Disable bogus VS warnings/errors...
-#  endif // _WIN32
 #  include "pdfio.h"
 #  include <stdarg.h>
 #  include <stdint.h>
@@ -21,38 +19,11 @@
 #  include <inttypes.h>
 #  include <fcntl.h>
 #  include <locale.h>
-#  ifdef _WIN32
-#    include <io.h>
-#    include <direct.h>
-#    include <windows.h> // GetTempPathA
-#    define access	_access		// Map standard POSIX/C99 names
-#    define close	_close
-#    define fileno	_fileno
-#    define lseek(f,o,w) (off_t)_lseek((f),(long)(o),(w))
-#    define mkdir(d,p)	_mkdir(d)
-#    define open	_open
-#    define read(f,b,s)	_read((f),(b),(unsigned)(s))
-#    define rmdir	_rmdir
-#    define snprintf	_snprintf
-#    define strdup	_strdup
-#    define unlink	_unlink
-#    define vsnprintf	_vsnprintf
-#    define write(f,b,s) _write((f),(b),(unsigned)(s))
-#    ifndef F_OK
-#      define F_OK	00		// POSIX parameters/flags
-#      define W_OK	02
-#      define R_OK	04
-#    endif // !F_OK
-#    define O_RDONLY	_O_RDONLY	// Map standard POSIX open flags
-#    define O_WRONLY	_O_WRONLY
-#    define O_CREAT	_O_CREAT
-#    define O_TRUNC	_O_TRUNC
-#    define O_BINARY	_O_BINARY
-#  else // !_WIN32
-#    include <unistd.h>
-#    define O_BINARY	0		// Map Windows-specific open flag
-#  endif // _WIN32
-#  include <zlib.h>
+
+#  include <unistd.h>
+#  define O_BINARY	0		// Map Windows-specific open flag
+
+#  include <lz4.h>
 
 
 //
@@ -323,7 +294,7 @@ struct _pdfio_stream_s			// Stream
   char		buffer[8192],		// Read/write buffer
 		*bufptr,		// Current position in buffer
 	        *bufend;		// End of buffer
-  z_stream	flate;			// Flate filter state
+  LZ4_stream_t	flate;			// Flate filter state
   _pdfio_predictor_t predictor;		// Predictor function, if any
   size_t	pbpixel,		// Size of a pixel in bytes
 		pbsize,			// Predictor buffer size, if any
