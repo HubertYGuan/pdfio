@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.0)
+if(CONFIG_PDFIO)
+cmake_minimum_required(VERSION 3.20)
 project(pdfio)
 
 file(GLOB libsources pdf*.c ttf.c)
@@ -11,11 +12,16 @@ set(cppflags -I/usr/include/libpng16  -DHAVE_LIBPNG=1  -DHAVE_TM_GMTOFF=1 -DHAVE
 set(cflags -fPIC  ${cppflags} ${optim} ${warnings})
 set(libs -lpng16  -lz -lz   -lm)
 
-add_library(pdfio STATIC ${libsources})
 
-add_compile_options( ${cflags} )
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -H")
-add_link_options( ${LIBS} )
+zephyr_interface_library_named(PDFIO)
 
-set(CMAKE_AR /usr/bin/ar)
-set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> cr <TARGET> <OBJECTS>")
+zephyr_include_directories(.)
+
+zephyr_library()
+zephyr_library_sources( ${libsources} )
+
+zephyr_library_compile_options_ifdef(PDFIO_BUILD ${cflags})
+
+zephyr_library_link_libraries(PDFIO)
+target_link_libraries(PDFIO INTERFACE zephyr_interface)
+endif(CONFIG_PDFIO)

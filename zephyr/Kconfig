@@ -1,0 +1,6 @@
+config PDFIO
+	bool "Enable PDFio"
+	default n
+	depends on ZLIB
+	help
+	  This option enables PDFio as a Zephyr module.
