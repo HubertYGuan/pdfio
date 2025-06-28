@@ -11,7 +11,7 @@
 #include "pdfio-private.h"
 #include <sys/time.h>
 // randomization may not have enough entropy on certain platforms
-#include <zephyr/sys/random.h>
+#include <zephyr/random/random.h>
 
 
 //
@@ -219,7 +219,7 @@ void
 _pdfioCryptoMakeRandom(uint8_t *buffer,	// I - Buffer
                        size_t  bytes)	// I - Number of bytes
 {
-  if (sys_csrand_get(buffer, len) == 0) return;
+  if (sys_csrand_get(buffer, bytes) == 0) return;
 
   // If we get here then we were unable to get enough random data or the local
   // system doesn't have enough entropy.  Make some up...
@@ -232,7 +232,6 @@ _pdfioCryptoMakeRandom(uint8_t *buffer,	// I - Buffer
 
   gettimeofday(&curtime, NULL);
   mt_state[0] = (uint32_t)(curtime.tv_sec + curtime.tv_usec);
-#  endif // _WIN32
 
   // Seed the random number state...
   mt_index = 0;

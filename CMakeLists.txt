@@ -8,7 +8,7 @@ list(REMOVE_ITEM libsources *testpdfio.c *testttf.c)
 
 set(warnings -Wall -Wunused -Wno-char-subscripts -Wno-format-truncation -Wno-format-y2k -Wno-switch -Wno-unused-result)
 set(optim -g -Os)
-set(cppflags -I/usr/include/libpng16  -DHAVE_LIBPNG=1  -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEGM=1  -D_FORTIFY_SOURCE=2 -D__USE_MISC -D_GNU_SOURCE -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64)
+set(cppflags  -D_FORTIFY_SOURCE=2 -D__USE_MISC -D_GNU_SOURCE -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64)
 set(cflags -fPIC  ${cppflags} ${optim} ${warnings})
 set(libs -lpng16  -lz -lz   -lm)
 
