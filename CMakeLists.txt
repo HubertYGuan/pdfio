@@ -21,6 +21,7 @@ zephyr_library()
 zephyr_library_sources( ${libsources} )
 
 zephyr_library_compile_options_ifdef(PDFIO_BUILD ${cflags})
+zephyr_library_compile_options(-U_POSIX_C_SOURCE -D_POSIX_C_SOURCE=200809L)
 
 zephyr_library_link_libraries(PDFIO)
 target_link_libraries(PDFIO INTERFACE zephyr_interface)

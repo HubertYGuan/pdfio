@@ -632,8 +632,8 @@ pdfioFileCreateTemporary(
   }
 
 #else
-  if ((tmpdir = getenv("TMPDIR")) == NULL || access(tmpdir, W_OK))
-    tmpdir = "/tmp";
+  // if ((tmpdir = getenv("TMPDIR")) == NULL || access(tmpdir, W_OK))
+    tmpdir = "/testfiles";
 #endif // _WIN32
 
   for (i = 0, fd = -1; i < 1000; i ++)
